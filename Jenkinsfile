@@ -16,12 +16,17 @@ pipeline {
         }
 
         stage('Deploy Application') {
-    steps {
-        sh '''
-        docker rm -f spacex-launch || true
-        docker run -d -p 5000:5000 --name spacex-launch spacex-launch-tracker
-        '''
+            steps {
+                sh '''
+                docker rm -f spacex-launch || true
+                docker run -d \
+                    --restart always \
+                    -p 5000:5000 \
+                    --name spacex-launch \
+                    spacex-launch-tracker
+                '''
+            }
         }
-    }   
+
     }
 }
