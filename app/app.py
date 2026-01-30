@@ -5,7 +5,6 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    # SpaceX v5 API to get the nearest upcoming launch
     url = "https://api.spacexdata.com/v5/launches/query"
 
     payload = {
@@ -20,11 +19,22 @@ def index():
         }
     }
 
-    response = requests.post(url, json=payload)
-    data = response.json()["docs"][0]
+    try:
+        response = requests.post(url, json=payload, timeout=10)
+        response.raise_for_status()
 
-    launch_name = data.get("name", "N/A")
-    launch_date = data.get("date_utc", "N/A")
+        docs = response.json().get("docs", [])
+
+        if not docs:
+            launch_name = "No upcoming launches found"
+            launch_date = "N/A"
+        else:
+            launch_name = docs[0].get("name", "N/A")
+            launch_date = docs[0].get("date_utc", "N/A")
+
+    except Exception as e:
+        launch_name = "SpaceX API unavailable"
+        launch_date = "Please try again later"
 
     return render_template(
         "index.html",
