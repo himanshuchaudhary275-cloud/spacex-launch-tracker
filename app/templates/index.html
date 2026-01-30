@@ -1,11 +1,33 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>SpaceX Tracker</title>
+    <title>SpaceX Launch Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #0b0d17;
+            color: white;
+            padding: 40px;
+        }
+        .card {
+            background: #1c1f2b;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 600px;
+        }
+        h1 {
+            color: #ffcc00;
+        }
+    </style>
 </head>
 <body>
+
+<div class="card">
     <h1>🚀 Next SpaceX Launch</h1>
-    <p><b>Name:</b> {{ launch.name }}</p>
-    <p><b>Date:</b> {{ launch.date_utc }}</p>
+    <p><strong>Mission:</strong> {{ name }}</p>
+    <p><strong>Launch Date (UTC):</strong> {{ date }}</p>
+    <p><strong>Details:</strong> {{ details }}</p>
+</div>
+
 </body>
 </html>

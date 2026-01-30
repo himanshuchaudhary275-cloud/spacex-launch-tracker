@@ -3,44 +3,34 @@ import requests
 
 app = Flask(__name__)
 
+SPACEX_API_URL = "https://api.spacexdata.com/v5/launches/next"
+
 @app.route("/")
 def index():
-    url = "https://api.spacexdata.com/v5/launches/query"
-
-    payload = {
-        "query": {
-            "upcoming": True
-        },
-        "options": {
-            "sort": {
-                "date_utc": "asc"
-            },
-            "limit": 1
-        }
-    }
-
     try:
-        response = requests.post(url, json=payload, timeout=10)
+        response = requests.get(SPACEX_API_URL, timeout=10)
         response.raise_for_status()
+        data = response.json()
 
-        docs = response.json().get("docs", [])
+        launch_name = data.get("name", "N/A")
+        launch_date = data.get("date_utc", "N/A")
+        details = data.get("details", "No details available")
 
-        if not docs:
-            launch_name = "No upcoming launches found"
-            launch_date = "N/A"
-        else:
-            launch_name = docs[0].get("name", "N/A")
-            launch_date = docs[0].get("date_utc", "N/A")
+        return render_template(
+            "index.html",
+            name=launch_name,
+            date=launch_date,
+            details=details
+        )
 
-    except Exception as e:
-        launch_name = "SpaceX API unavailable"
-        launch_date = "Please try again later"
-
-    return render_template(
-        "index.html",
-        name=launch_name,
-        date=launch_date
-    )
+    except requests.exceptions.RequestException as e:
+        # Safe fallback (NO 500 error)
+        return render_template(
+            "index.html",
+            name="Unable to fetch launch data",
+            date="N/A",
+            details="SpaceX API may be temporarily unavailable."
+        )
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
